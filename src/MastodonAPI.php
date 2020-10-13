@@ -36,12 +36,7 @@ class MastodonAPI
     {
         /** @var \GuzzleHttp\Client client */
         $this->client = new Client();
-
-        try {
-            $this->config = $config;
-        }catch (\InvalidArgumentException $exception) {
-            print($exception->getMessage());
-        }
+        $this->config = $config;
     }
 
     /**
@@ -60,27 +55,19 @@ class MastodonAPI
 
         $allowedOperations = ['get', 'post'];
         if(!in_array($operation, $allowedOperations)) {
-            echo 'ERROR: only ' . implode(',', $allowedOperations) . 'are allowed';
             return $result;
         }
 
-        try {
-            $response = $this->client->{$operation}($uri, [
-            'headers' => [
-              'Authorization' => 'Bearer ' . $this->config->getBearer(),
-            ],
-            'json' => $json,
-            ]);
-            // @todo $request->getHeader('content-type')
-            if($response instanceof ResponseInterface
-              && $response->getStatusCode() == '200') {
-                $result = json_decode($response->getBody(), true);
-            }else{
-                echo 'ERROR: Status code ' . $response->getStatusCode();
-            }
-            // @todo check thrown exception
-        } catch (\Exception $exception) {
-            echo 'ERROR: ' . $exception->getMessage();
+        $response = $this->client->{$operation}($uri, [
+        'headers' => [
+          'Authorization' => 'Bearer ' . $this->config->getBearer(),
+        ],
+        'json' => $json,
+        ]);
+        // @todo $request->getHeader('content-type')
+        if($response instanceof ResponseInterface
+          && $response->getStatusCode() == '200') {
+            $result = json_decode($response->getBody(), true);
         }
         return $result;
     }
