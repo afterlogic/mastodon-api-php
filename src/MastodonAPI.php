@@ -63,6 +63,7 @@ class MastodonAPI
           'Authorization' => 'Bearer ' . $this->config->getBearer(),
         ],
         'json' => $json,
+        'http_errors' => false
         ]);
         // @todo $request->getHeader('content-type')
         if($response instanceof ResponseInterface) {
