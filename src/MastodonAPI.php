@@ -65,8 +65,7 @@ class MastodonAPI
         'json' => $json,
         ]);
         // @todo $request->getHeader('content-type')
-        if($response instanceof ResponseInterface
-          && $response->getStatusCode() == '200') {
+        if($response instanceof ResponseInterface) {
             $result = json_decode($response->getBody(), true);
         }
         return $result;
