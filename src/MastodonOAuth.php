@@ -49,22 +49,18 @@ class MastodonOAuth
         $result = null;
         // endpoint
         $uri = $this->config->getBaseUrl() . $endpoint;
-        try {
-            $response = $this->client->post(
-                $uri, [
+        $response = $this->client->post(
+            $uri, [
                 'json' => $json,
-                ]
-            );
-            // @todo $request->getHeader('content-type')
-            if($response->getStatusCode() == '200') {
-                $result = json_decode($response->getBody(), true);
-            }else{
-                echo 'ERROR: Status code ' . $response->getStatusCode();
-            }
-            // @todo check thrown exception
-        } catch (\Exception $exception) {
-            echo 'ERROR: ' . $exception->getMessage();
-        }
+                // 'headers' => [
+                //     'Authorization' => 'Bearer ' . $this->config->getBearer(),
+                // ],
+                'http_errors' => false
+            ]
+        );
+        // @todo $request->getHeader('content-type')
+        $result = json_decode($response->getBody(), true);
+        // @todo check thrown exception
         return $result;
     }
 
@@ -80,13 +76,10 @@ class MastodonOAuth
             '/api/'.ConfigurationVO::API_VERSION.'/apps',
             $options
         );
-        if (isset($credentials["client_id"])
-            && isset($credentials["client_secret"])
-        ) {
+        if (isset($credentials["client_id"]) && isset($credentials["client_secret"])) 
+        {
             $this->config->setClientId($credentials['client_id']);
             $this->config->setClientSecret($credentials['client_secret']);
-        }else {
-            echo 'ERROR: no credentials in API response';
         }
     }
 
@@ -99,7 +92,8 @@ class MastodonOAuth
     public function getAuthorizationUrl() 
     {
         $result = null;
-        if (!$this->config->hasCredentials()) {
+        if (!$this->config->hasCredentials()) 
+        {
             $this->registerApplication();
         }
         //Return the Authorization URL
@@ -123,10 +117,9 @@ class MastodonOAuth
         $result = null;
         $options = $this->config->getAccessTokenConfiguration();
         $token = $this->getResponse('/oauth/token', $options);
-        if (isset($token['access_token'])) {
+        if (isset($token['access_token'])) 
+        {
             $this->config->setBearer($token['access_token']);
-        }else {
-            echo 'ERROR: no access token in API response';
         }
     }
 
@@ -138,7 +131,8 @@ class MastodonOAuth
      */
     public function authenticateUser($email, $password) 
     {
-        if (empty($this->config->getBearer())) {
+        if (empty($this->config->getBearer())) 
+        {
             $this->getAccessToken();
         }
         // @todo validate email address and password
