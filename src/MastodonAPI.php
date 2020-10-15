@@ -32,7 +32,7 @@ class MastodonAPI
      *
      * @param array $config
      */
-    public function __construct(ConfigurationVO $config) 
+    public function __construct(ConfigurationVO $config)
     {
         /** @var \GuzzleHttp\Client client */
         $this->client = new Client();
@@ -47,73 +47,27 @@ class MastodonAPI
      *
      * @return mixed|null
      */
-    private function getResponse($endpoint, $operation, array $json) 
+    public function getResponse($endpoint, $operation, array $json, $token = null)
     {
         $result = null;
         $uri = $this->config->getBaseUrl() . '/api/';
         $uri .= ConfigurationVO::API_VERSION . $endpoint;
-
-        $allowedOperations = ['get', 'post'];
-        if(!in_array($operation, $allowedOperations)) {
-            return $result;
+        if ($token === null)
+        {
+            $token = $this->config->getBearer();
         }
-
         $response = $this->client->{$operation}($uri, [
-        'headers' => [
-          'Authorization' => 'Bearer ' . $this->config->getBearer(),
-        ],
-        'json' => $json,
-        'http_errors' => false
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+            ],
+            'json' => $json,
+            'http_errors' => false
         ]);
         // @todo $request->getHeader('content-type')
-        if($response instanceof ResponseInterface) {
+        if($response instanceof ResponseInterface)
+        {
             $result = json_decode($response->getBody(), true);
         }
         return $result;
     }
-
-    /**
-     * Get operation.
-     *
-     * @param $endpoint
-     * @param array $params
-     *
-     * @return mixed|null
-     */
-    public function get($endpoint, array $params = []) 
-    {
-        return $this->getResponse($endpoint, 'get', $params);
-    }
-
-    /**
-     * Post operation.
-     *
-     * @param $endpoint
-     * @param array $params
-     *
-     * @return mixed|null
-     */
-    public function post($endpoint, array $params = []) 
-    {
-        return $this->getResponse($endpoint, 'post', $params);
-    }
-
-    /**
-     * Delete operation.
-     *
-     * @param $endpoint
-     * @param array $params
-     *
-     * @return mixed|null
-     */
-    public function delete($endpoint, array $params = []) 
-    {
-        // @todo implement
-    }
-
-    public function stream($endpoint) 
-    {
-        // @todo implement
-    }
-
 }
